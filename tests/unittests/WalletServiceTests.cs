@@ -1,16 +1,27 @@
 ﻿using BettySlotGame.Services;
 using BettySlotGame.Services.Abtractions;
+using Castle.Core.Logging;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace BettySlotGameUnitTests
 {
     public class WalletServiceTests
     {
+        private Mock<ILogger<WalletService>> _loggerMock;
+        private IConsoleService _consoleService;
+
+        public WalletServiceTests()
+        {
+            _loggerMock = new Mock<ILogger<WalletService>>();
+            _consoleService = new ConsoleService();
+        }
 
         [Fact]
         public void DepositShouldIncreaseBalance()
         {
             //Arange
-            var walletService = new WalletService();
+            var walletService = new WalletService(_consoleService, _loggerMock.Object);
 
             decimal depositAmount = 100.0m;
 
@@ -25,7 +36,7 @@ namespace BettySlotGameUnitTests
         public void DepositShouldThrowException()
         {
             //Arange
-            var walletService = new WalletService();
+            var walletService = new WalletService(_consoleService, _loggerMock.Object);
 
             // Assert
             Assert.Throws<ArgumentException>(() => walletService.Deposit(-50.0m));
@@ -35,7 +46,7 @@ namespace BettySlotGameUnitTests
         public void WithdrawShouldShouldDecreaseBalanceIfThereIsEnoughtBalance()
         {
             //Arange
-            var walletService = new WalletService();
+            var walletService = new WalletService(_consoleService, _loggerMock.Object);
             walletService.Deposit(200.0m);
 
             // Act
@@ -49,7 +60,7 @@ namespace BettySlotGameUnitTests
         public void WithdrawShouldShouldDecreaseBalanceIfThereIsNotEnoughtBalance()
         {
             //Arange
-            var walletService = new WalletService();
+            var walletService = new WalletService(_consoleService, _loggerMock.Object);
             walletService.Deposit(100.0m);
 
             // Assert
@@ -60,7 +71,7 @@ namespace BettySlotGameUnitTests
         public void WithdrawShouldShouldDecreaseBalanceIfThereIsNegativeNumberInput()
         {
             //Arange
-            var walletService = new WalletService();
+            var walletService = new WalletService(_consoleService, _loggerMock.Object);
             walletService.Deposit(100.0m);
 
             // Assert
@@ -71,7 +82,7 @@ namespace BettySlotGameUnitTests
         public void ApplyGameResultShouldUpdateBalanceCorrectly()
         {
             //Arange
-            var walletService = new WalletService();
+            var walletService = new WalletService(_consoleService, _loggerMock.Object);
             walletService.Deposit(100.0m);
             decimal betAmount = 20.0m;
             decimal winAmount = 50.0m;

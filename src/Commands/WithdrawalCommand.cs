@@ -30,18 +30,24 @@ namespace BettySlotGame.Commands
                     return;
                 }
 
-                var command = new Command { CommandName = "withdraw", Value = amount };
-                var result = _validator.Validate(command);
-
-                if (!result.IsValid)
+                if (!_wallet.CanAfford(amount))
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        _consoleService.WriteLine($"{error.ErrorMessage}");
-                    }
-
+                    _consoleService.WriteLine($"Insufficient funds. Current balance: ${_wallet.Balance:0.##}");
                     return;
                 }
+
+                //var command = new Command { CommandName = "withdraw", Value = amount };
+                //var result = _validator.Validate(command);
+
+                //if (!result.IsValid)
+                //{
+                //    foreach (var error in result.Errors)
+                //    {
+                //        _consoleService.WriteLine($"{error.ErrorMessage}");
+                //    }
+
+                //    return;
+                //}
 
                 _wallet.Withdraw(amount);
 

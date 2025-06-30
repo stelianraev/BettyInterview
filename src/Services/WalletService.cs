@@ -64,5 +64,10 @@ namespace BettySlotGame.Services
                 _consoleService.WriteLine($"No luck this time! Your cuurent balance is: ${_balance.ToString("0.##")}");
             }
         }
+
+        public bool CanAfford(decimal amount)
+        {
+            return Balance >= amount;
+        }
     }
 }

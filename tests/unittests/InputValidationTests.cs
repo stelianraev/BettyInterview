@@ -13,7 +13,7 @@ namespace BettySlotGameUnitTests
 
         public InputValidationTests()
         {
-            _walletMock.Setup(wallet => wallet.Balance).Returns(100);
+            _walletMock.Setup(wallet => wallet.Balance);
 
             _validator = new CommandValidator(_walletMock.Object);
 
@@ -27,7 +27,6 @@ namespace BettySlotGameUnitTests
         [InlineData("wrongCommand", 10)]
         [InlineData("deposit", -100)]
         [InlineData("withdraw", -50)]
-        [InlineData("withdraw", 200)]
         public void InvalidInputValidation(string commandName, decimal value)
         {
             var command = new Command { CommandName = commandName, Value = value };

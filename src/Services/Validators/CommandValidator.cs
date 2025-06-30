@@ -30,14 +30,6 @@ namespace BettySlotGame.Services.Validators
             RuleFor(x => x.Value)
                 .GreaterThan(0)
                 .WithMessage("Value must be greater than zero.");
-
-            RuleFor(x => x)
-                .Must(x => !x.CommandName!.Equals(CommandEnum.Bet.ToString(), StringComparison.InvariantCultureIgnoreCase) || _wallet.Balance >= x.Value)
-                .WithMessage(x => $"Insufficient balance for the bet. Your current balance is: ${_wallet.Balance.ToString("0.##")}");
-
-            RuleFor(x => x)
-                .Must(x => !(x.CommandName!.Equals(CommandEnum.Withdraw.ToString(), StringComparison.InvariantCultureIgnoreCase) && _wallet.Balance < x.Value))
-                .WithMessage(x => $"Insufficient funds for withdrawal. Your current balance is: ${_wallet.Balance.ToString("0.##")}");
         }
     }
 }

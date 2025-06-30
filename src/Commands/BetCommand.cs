@@ -47,6 +47,12 @@ namespace BettySlotGame.Commands
                     }
                 }
 
+                if (!_wallet.CanAfford(amount))
+                {
+                    _consoleService.WriteLine($"Insufficient funds. Current balance: ${_wallet.Balance:0.##}");
+                    return;
+                }
+
                 var win = _engine.Bet(amount);
                 _wallet.ApplyGameResult(amount, win);
             }
