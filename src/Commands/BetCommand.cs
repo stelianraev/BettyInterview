@@ -34,7 +34,7 @@ namespace BettySlotGame.Commands
                     return;
                 }
 
-                var command = new Command { CommandName = "bet", Value = amount };
+                var command = new Command { CommandName = "bet", Value = amount, MinBet = 1, MaxBet = 10 };
                 var result = _validator.Validate(command);
 
                 if (!result.IsValid)

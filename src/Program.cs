@@ -38,7 +38,16 @@ namespace BettySlotGame
                 .Build();
 
             var app = host.Services.GetRequiredService<ISlotGameService>();
-            app.StartGame();
+
+            try
+            {
+                app.StartGame();
+            }
+            catch (Exception ex)
+            {
+                var logger = host.Services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred while starting the game.");
+            }       
         }
     }
 }

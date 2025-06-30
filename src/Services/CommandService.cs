@@ -20,24 +20,33 @@ namespace BettySlotGame.Services
 
         public void HandleInput(string input, CancellationToken token)
         {
-            var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            if (parts.Length == 0)
+            try
             {
-                return;
-            }
-                
-            var command = _commands.FirstOrDefault(c => c.Name.Equals(parts[0], StringComparison.OrdinalIgnoreCase));
+                var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            if (command == null)
+                if (parts.Length == 0)
+                {
+                    return;
+                }
+
+                var command = _commands.FirstOrDefault(c => c.Name.Equals(parts[0], StringComparison.OrdinalIgnoreCase));
+
+                if (command == null)
+                {
+                    _consoleService.WriteLine($"Unknown command: {parts[0]}");
+                    _logger.LogInformation($"Invalid input {parts[0]}");
+
+                    return;
+                }
+
+                _logger.LogInformation($"Command {command.Name} is ready for execute");
+                command.Execute(parts, token);
+            }
+            catch (Exception ex)
             {
-                _consoleService.WriteLine($"Unknown command: {parts[0]}");
-                _logger.LogInformation($"Invalid input {parts[0]}");
-
-                return;
+                _logger.LogError(ex, "An error occurred while processing the command.");
+                _consoleService.WriteLine("An error occurred while processing the command. Please try again.");
             }
-
-            command.Execute(parts, token);
         }
     }
 }
