@@ -30,4 +30,6 @@
 | bet <amount>      | Place a bet to the slot machine                |
 | exit              | End the game session                           |
 
+### 🗂️ Shema
+![Schema](https://github.com/user-attachments/assets/85547423-d6a9-4dd1-af3e-705985d38761)
 
