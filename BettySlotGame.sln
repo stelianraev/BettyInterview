@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36221.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BettySlotGame", "src\BettySlotGame.csproj", "{AAD2C6A1-09AE-4B0E-AEFE-EAB0301C685A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BettySlotGameUnitTests", "..src\unittests\BettySlotGameUnitTests\BettySlotGameUnitTests.csproj", "{2AB753E6-CEA1-4156-9942-D06B9FB5CB44}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AAD2C6A1-09AE-4B0E-AEFE-EAB0301C685A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAD2C6A1-09AE-4B0E-AEFE-EAB0301C685A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAD2C6A1-09AE-4B0E-AEFE-EAB0301C685A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAD2C6A1-09AE-4B0E-AEFE-EAB0301C685A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AB753E6-CEA1-4156-9942-D06B9FB5CB44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AB753E6-CEA1-4156-9942-D06B9FB5CB44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AB753E6-CEA1-4156-9942-D06B9FB5CB44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AB753E6-CEA1-4156-9942-D06B9FB5CB44}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5280F244-CA8D-414F-8391-6AE997CF6408}
+	EndGlobalSection
+EndGlobal
