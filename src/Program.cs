@@ -1,5 +1,4 @@
-﻿using BettySlotGame.Commands;
-using BettySlotGame.Extensions;
+﻿using BettySlotGame.Extensions;
 using BettySlotGame.Models;
 using BettySlotGame.Services;
 using BettySlotGame.Services.Abtractions;
@@ -31,8 +30,6 @@ namespace BettySlotGame
 
                     services.AddLogging(builder =>
                     {
-                        //builder.AddConsole();
-                        //builder.SetMinimumLevel(LogLevel.Information);
                         builder.ClearProviders();
                     });
 

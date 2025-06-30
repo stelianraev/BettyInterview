@@ -11,12 +11,14 @@ namespace BettySlotGame.Commands
         private readonly ISlotEngine _engine;
         private readonly IValidator<Command> _validator;
         private readonly ILogger<BetCommand> _logger;
+        private readonly IConsoleService _consoleService;
 
-        public BetCommand(IWalletService wallet, ISlotEngine engine, IValidator<Command> validator, ILogger<BetCommand> logger)
+        public BetCommand(IWalletService wallet, ISlotEngine engine, IValidator<Command> validator, IConsoleService consoleService, ILogger<BetCommand> logger)
         {
             _wallet = wallet;
             _engine = engine;
             _validator = validator;
+            _consoleService = consoleService;
         }
 
         public string Name => CommandEnum.Bet.ToString();
@@ -27,7 +29,8 @@ namespace BettySlotGame.Commands
             {
                 if (args.Length < 2 || !decimal.TryParse(args[1], out var amount))
                 {
-                    Console.WriteLine("Unknow command");
+                    _consoleService.WriteLine("Unknown command");
+                    _logger.LogInformation($"Invalid input {args.ToString()}");
                     return;
                 }
 
@@ -38,7 +41,7 @@ namespace BettySlotGame.Commands
                 {
                     foreach (var error in result.Errors)
                     {
-                        Console.WriteLine($"{error.ErrorMessage}");
+                        _consoleService.WriteLine($"{error.ErrorMessage}");
                     }
 
                     return;

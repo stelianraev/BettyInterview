@@ -10,12 +10,14 @@ namespace BettySlotGame.Commands
         private readonly IWalletService _wallet;
         private readonly IValidator<Command> _validator;
         private readonly ILogger<DepositCommand> _logger;
+        private readonly IConsoleService _consoleService;
 
-        public DepositCommand(IValidator<Command> valdator, IWalletService wallet, ILogger<DepositCommand> logger)
+        public DepositCommand(IValidator<Command> valdator, IWalletService wallet, IConsoleService consoleService, ILogger<DepositCommand> logger)
         {
             _validator = valdator;
             _wallet = wallet;
             _logger = logger;
+            _consoleService = consoleService;
         }
 
         public string Name => CommandEnum.Deposit.ToString();
@@ -26,7 +28,8 @@ namespace BettySlotGame.Commands
             {
                 if (args.Length < 2 || !decimal.TryParse(args[1], out var amount))
                 {
-                    Console.WriteLine("Unknow command");
+                    _consoleService.WriteLine("Unknow command");
+                    _logger.LogInformation($"Invalid input {args.ToString()}");
                     return;
                 }
 
@@ -37,7 +40,7 @@ namespace BettySlotGame.Commands
                 {
                     foreach (var error in result.Errors)
                     {
-                        Console.WriteLine($"{error.ErrorMessage}");
+                        _consoleService.WriteLine($"{error.ErrorMessage}");
                     }
 
                     return;

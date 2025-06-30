@@ -1,5 +1,4 @@
 ﻿using BettySlotGame.Services.Abtractions;
-using System.Text;
 
 namespace BettySlotGame.Services
 {
@@ -7,10 +6,12 @@ namespace BettySlotGame.Services
     {
         private readonly ICommandService _commandService;
         private readonly CancellationTokenSource _cts;
+        private readonly IConsoleService _consoleService;
 
-        public SlotGameService(ISlotEngine gameEngine, IWalletService wallet, ICommandService commandServices, CancellationTokenSource cts)
+        public SlotGameService(ISlotEngine gameEngine, IWalletService wallet, ICommandService commandServices, IConsoleService consoleService, CancellationTokenSource cts)
         {
-            _commandService = commandServices ?? throw new ArgumentNullException(nameof(commandServices), "Command service cannot be null.");
+            _commandService = commandServices;
+            _consoleService = consoleService;
             _cts = cts;
         }
 
@@ -18,15 +19,15 @@ namespace BettySlotGame.Services
         {
             while (!_cts.Token.IsCancellationRequested)
             {
-                Console.WriteLine("Please, submimt action:");
-                var input = Console.ReadLine();
+                _consoleService.WriteLine("Please, submimt action:");
+                var input = _consoleService.ReadLine();
                 
                 _commandService.HandleInput(input, _cts.Token);
 
-                Console.WriteLine();
+                _consoleService.WriteLine();
             }
 
-            Console.WriteLine("Press any key to exit.");
+            _consoleService.WriteLine("Press any key to exit.");
         }
     }
 }
