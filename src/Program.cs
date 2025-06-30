@@ -25,6 +25,7 @@ namespace BettySlotGame
                     services.AddSingleton<ISlotGameService, SlotGameService>();
                     services.AddSingleton<ICommandService, CommandService>();
                     services.AddSingleton<IValidator<Command>, CommandValidator>();
+                    services.AddSingleton<IConsoleService, ConsoleService>();
 
                     services.RegisterAllCommands();
 

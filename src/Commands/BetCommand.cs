@@ -42,9 +42,9 @@ namespace BettySlotGame.Commands
                     foreach (var error in result.Errors)
                     {
                         _consoleService.WriteLine($"{error.ErrorMessage}");
-                    }
 
-                    return;
+                        return;
+                    }
                 }
 
                 var win = _engine.Bet(amount);
