@@ -36,18 +36,18 @@ namespace BettySlotGame.Commands
                     return;
                 }
 
-                //var command = new Command { CommandName = "withdraw", Value = amount };
-                //var result = _validator.Validate(command);
+                var command = new Command { CommandName = "withdraw", Value = amount };
+                var result = _validator.Validate(command);
 
-                //if (!result.IsValid)
-                //{
-                //    foreach (var error in result.Errors)
-                //    {
-                //        _consoleService.WriteLine($"{error.ErrorMessage}");
-                //    }
+                if (!result.IsValid)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        _consoleService.WriteLine($"{error.ErrorMessage}");
+                    }
 
-                //    return;
-                //}
+                    return;
+                }
 
                 _wallet.Withdraw(amount);
 
