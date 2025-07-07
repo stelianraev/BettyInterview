@@ -50,7 +50,7 @@ namespace BettySlotGame.Commands
 
                     _walletService.Withdraw(withdrawAmount);
 
-                    _consoleService.WriteLine($"Your withdrawal of ${withdrawAmount} was successful. Your current balance is: ${_walletService.Balance.ToString("0.##")}");
+                    _consoleService.WriteLine($"Your withdrawal of ${withdrawAmount.ToString("0.##")} was successful. Your current balance is: ${_walletService.Balance.ToString("0.##")}");
 
                     _logger.LogInformation($"Successfully withdrew ${withdrawAmount}. Current balance: ${_walletService.Balance.ToString("0.##")}");
                 }

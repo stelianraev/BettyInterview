@@ -47,7 +47,7 @@ namespace BettySlotGame.Commands
 
                 if(!canExecute)
                 {
-                    throw new InvalidBetPlacementException($"Bet amount must be between {_slotSettings.MinBet} and {_slotSettings.MaxBet}");
+                    throw new InvalidBetPlacementException($"Bet amount must be between {_slotSettings.MinBet.ToString("0.##")} and {_slotSettings.MaxBet.ToString("0.##")}");
                 }
                 else
                 {
@@ -59,14 +59,14 @@ namespace BettySlotGame.Commands
                     if(isWin)
                     {
                         _walletService.Deposit(returnAmount);
-                        _consoleService.WriteLine($"Congrats - you won ${returnAmount}! Your current balance is: ${_walletService.Balance.ToString("0.##")}");
+                        _consoleService.WriteLine($"Congrats - you won ${returnAmount.ToString("0.##")}! Your current balance is: ${_walletService.Balance.ToString("0.##")}");
                         _logger.LogInformation($"Successfully won ${returnAmount}. Current balance: ${_walletService.Balance.ToString("0.##")}");
                         return;
                     }
                     else
                     {                        
                         _consoleService.WriteLine($"No luck this time! Your cuurent balance is: ${_walletService.Balance.ToString("0.##")}");
-                        _logger.LogInformation($"Bet of ${bet} was lost. Current balance: ${_walletService.Balance.ToString("0.##")}");
+                        _logger.LogInformation($"Bet of ${bet.ToString("0.##")} was lost. Current balance: ${_walletService.Balance.ToString("0.##")}");
                     }
                 }
             }

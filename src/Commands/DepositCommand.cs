@@ -49,7 +49,7 @@ namespace BettySlotGame.Commands
                     var depositAmount = (decimal)command.Value!;
 
                     _walletService.Deposit(depositAmount);
-                    _consoleService.WriteLine($"Your deposit of ${depositAmount} was successful. Your current balance is: ${_walletService.Balance.ToString("0.##")}");
+                    _consoleService.WriteLine($"Your deposit of ${depositAmount.ToString("0.##")} was successful. Your current balance is: ${_walletService.Balance.ToString("0.##")}");
                     _logger.LogInformation($"Successfully deposited ${depositAmount}. Current balance: ${_walletService.Balance.ToString("0.##")}");
                 }
             }
