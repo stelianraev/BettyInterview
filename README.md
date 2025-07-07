@@ -5,9 +5,14 @@
   - 40% win ×2
   - 10% win ×2 to ×10 (random)
 - 💰 Wallet service to manage player funds
-- 🧰 FluentValidation integration for robust command validation
 - 🔌 DI-powered architecture via `Microsoft.Extensions.DependencyInjection`
 -  🧪 Unit tests
+
+### Description
+1. Used 64 byte cryptographic algorithm to minimalize predictable of slot game and guarantee randomise
+2. Added realistic Monte Carlo Statistical Test to test the probability of each win, big win, lose percentage is it in permissible range
+3. Separate each command in SystemCommand interface guarantee Single Responsability (Could be made with delegates also)
+6. AppSettings - json configuration, for easy manipulation of changes
 
 
 ## 🧠 Architecture
@@ -16,11 +21,14 @@
 | Component         | Responsibility                                 |
 |-------------------|------------------------------------------------|
 | `ICommand`        | Interface for executable commands              |
-| `CommandService`  | Parses and routes input to commands            |
+| `CommandRegistry` | Parses and routes input to commands            |
 | `IWalletService`  | Handles deposit, withdraw, and balance logic   |
 | `ISlotEngine`     | Encapsulates the slot game rules               |
-| `FluentValidation`| Validates command input data                   |
 | `IConsoleService` | Abstracted Console I/O for testability         |
+
+### XUnit unit tests
+### XUnit IntegrationTests
+### XUnit Statistical test for statistical mistake
 
 ## 🪟 Available Commands
 | Commands          | Responsibility                                 |
@@ -29,7 +37,3 @@
 | withdraw <amount> | Withdraw the amount from wallet balance        |
 | bet <amount>      | Place a bet to the slot machine                |
 | exit              | End the game session                           |
-
-### 🗂️ Shema
-![Schema](https://github.com/user-attachments/assets/85547423-d6a9-4dd1-af3e-705985d38761)
-
