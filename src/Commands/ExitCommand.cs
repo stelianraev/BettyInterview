@@ -1,12 +1,14 @@
-﻿using BettySlotGame.Models;
+﻿
+using BettySlotGame.Models;
 using Microsoft.Extensions.Logging;
 
 namespace BettySlotGame.Commands
 {
-    public class ExitCommand : ICommand
+    public class ExitCommand : ISlotCommand
     {
         private readonly CancellationTokenSource _cts;
         private readonly ILogger<ExitCommand> _logger;
+
         public ExitCommand(CancellationTokenSource cts, ILogger<ExitCommand> logger)
         {
             _cts = cts;
@@ -15,11 +17,17 @@ namespace BettySlotGame.Commands
 
         public string Name => CommandEnum.Exit.ToString();
 
-        public void Execute(string[] args, CancellationToken cancellationToken)
+        public event EventHandler? CanExecuteChanged;
+
+        public bool CanExecute(object? parameter)
         {
+            return true;
+        }
+
+        public void Execute(object? parameter)
+        {
+            _logger.LogInformation("Exit command executed. Application will terminate.");
             _cts.Cancel();
-            _logger.LogInformation("Thank you for playing! Hoe to see you again soon.");
-            return;
         }
     }
 }

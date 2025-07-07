@@ -1,62 +1,59 @@
 ﻿using BettySlotGame.Models;
 using BettySlotGame.Services.Abtractions;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace BettySlotGame.Commands
 {
-    public class WithdrawalCommand : ICommand
+    public class WithdrawalCommand : ISlotCommand
     {
-        private readonly IWalletService _wallet;
-        private readonly IValidator<Command> _validator;
-        private readonly ILogger<WithdrawalCommand> _logger;
+        private readonly IWalletService _walletService;
         private readonly IConsoleService _consoleService;
-        public WithdrawalCommand(IValidator<Command> validator, IWalletService wallet, IConsoleService console, ILogger<WithdrawalCommand> logger)
+        private readonly ILogger<WithdrawalCommand> _logger;
+
+        public WithdrawalCommand(IWalletService walletService, IConsoleService consoleService, ILogger<WithdrawalCommand> logger)
         {
-            _validator = validator;
-            _wallet = wallet;
+            _walletService = walletService;
+            _consoleService = consoleService;
             _logger = logger;
-            _consoleService = console;
         }
+
         public string Name => CommandEnum.Withdraw.ToString();
-        public void Execute(string[] args, CancellationToken cancellationToken)
+
+        public event EventHandler? CanExecuteChanged;
+
+        public bool CanExecute(object? parameter)
         {
-            try
+            if (parameter is InputCommand command)
             {
-                if (args.Length < 2 || !decimal.TryParse(args[1], out var amount))
+                if (command.Value == null)
                 {
-                    _consoleService.WriteLine("Unknow command");
-                    _logger.LogInformation($"Invalid input {args.ToString()}");
-                    return;
+                    return false;
                 }
-
-                if (!_wallet.CanAfford(amount))
-                {
-                    _consoleService.WriteLine($"Insufficient funds. Current balance: ${_wallet.Balance:0.##}");
-                    return;
-                }
-
-                var command = new Command { CommandName = "withdraw", Value = amount };
-                var result = _validator.Validate(command);
-
-                if (!result.IsValid)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        _consoleService.WriteLine($"{error.ErrorMessage}");
-                    }
-
-                    return;
-                }
-
-                _wallet.Withdraw(amount);
-
-                return;
             }
-            catch (Exception ex)
+
+            return true;
+        }
+
+        public void Execute(object? parameter)
+        {
+            if (parameter is InputCommand command)
             {
-                _logger.LogError(ex, "An error occurred while executing the withdrawal command.");
-                return;
+                var canExecute = CanExecute(command);
+
+                if (!canExecute)
+                {
+                    throw new ArgumentException("Invalid withdraw");
+                }
+                else
+                {
+                    var withdrawAmount = (decimal)command.Value!;
+
+                    _walletService.Withdraw(withdrawAmount);
+
+                    _consoleService.WriteLine($"Your withdrawal of ${withdrawAmount} was successful. Your current balance is: ${_walletService.Balance.ToString("0.##")}");
+
+                    _logger.LogInformation($"Successfully withdrew ${withdrawAmount}. Current balance: ${_walletService.Balance.ToString("0.##")}");
+                }
             }
         }
     }

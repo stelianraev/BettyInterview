@@ -1,64 +1,74 @@
-﻿using BettySlotGame.Models;
+﻿using BettySlotGame.Exceptions;
+using BettySlotGame.Models;
 using BettySlotGame.Services.Abtractions;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BettySlotGame.Commands
 {
-    public class BetCommand : ICommand
+    public class BetCommand : ISlotCommand
     {
-        private readonly IWalletService _wallet;
-        private readonly ISlotEngine _engine;
-        private readonly IValidator<Command> _validator;
-        private readonly ILogger<BetCommand> _logger;
+        private readonly ISlotEngine _slotEngine;
+        private readonly IWalletService _walletService;
         private readonly IConsoleService _consoleService;
+        private readonly BettySlotSettings _slotSettings;
+        private readonly ILogger<BetCommand> _logger;
 
-        public BetCommand(IWalletService wallet, ISlotEngine engine, IValidator<Command> validator, IConsoleService consoleService, ILogger<BetCommand> logger)
+        public BetCommand(ISlotEngine slotEngine, IWalletService walletService, IConsoleService consoleService, IOptions<BettySlotSettings> slotSettings, ILogger<BetCommand> logger)
         {
-            _wallet = wallet;
-            _engine = engine;
-            _validator = validator;
+            _slotEngine = slotEngine;
+            _walletService = walletService;
             _consoleService = consoleService;
+            _slotSettings = slotSettings.Value;
+            _logger = logger;
         }
-
         public string Name => CommandEnum.Bet.ToString();
 
-        public void Execute(string[] args, CancellationToken token)
+        public event EventHandler? CanExecuteChanged;
+
+        public bool CanExecute(object? parameter)
         {
-            try
+            if (parameter is InputCommand command)
             {
-                if (args.Length < 2 || !decimal.TryParse(args[1], out var amount))
+                if (!(command.Value >= _slotSettings.MinBet && command.Value <= _slotSettings.MaxBet))
                 {
-                    _consoleService.WriteLine("Unknown command");
-                    _logger.LogInformation($"Invalid input {args.ToString()}");
-                    return;
+                    return false;
                 }
+            }
 
-                var command = new Command { CommandName = "bet", Value = amount, MinBet = 1, MaxBet = 10 };
-                var result = _validator.Validate(command);
+            return true;
+        }
 
-                if (!result.IsValid)
+        public void Execute(object? parameter)
+        {
+            if (parameter is InputCommand command)
+            {
+                var canExecute = CanExecute(command);
+
+                if(!canExecute)
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        _consoleService.WriteLine($"{error.ErrorMessage}");
+                    throw new InvalidBetPlacementException($"Bet amount must be between {_slotSettings.MinBet} and {_slotSettings.MaxBet}");
+                }
+                else
+                {
+                    var bet = (decimal)command.Value!;
+                    _walletService.Withdraw(bet);
 
+                    var (isWin, returnAmount) = _slotEngine.Bet(bet);
+
+                    if(isWin)
+                    {
+                        _walletService.Deposit(returnAmount);
+                        _consoleService.WriteLine($"Congrats - you won ${returnAmount}! Your current balance is: ${_walletService.Balance.ToString("0.##")}");
+                        _logger.LogInformation($"Successfully won ${returnAmount}. Current balance: ${_walletService.Balance.ToString("0.##")}");
                         return;
                     }
+                    else
+                    {                        
+                        _consoleService.WriteLine($"No luck this time! Your cuurent balance is: ${_walletService.Balance.ToString("0.##")}");
+                        _logger.LogInformation($"Bet of ${bet} was lost. Current balance: ${_walletService.Balance.ToString("0.##")}");
+                    }
                 }
-
-                if (!_wallet.CanAfford(amount))
-                {
-                    _consoleService.WriteLine($"Insufficient funds. Current balance: ${_wallet.Balance:0.##}");
-                    return;
-                }
-
-                var win = _engine.Bet(amount);
-                _wallet.ApplyGameResult(amount, win);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while executing the bet command.");
             }
         }
     }

@@ -1,40 +1,57 @@
-﻿using BettySlotGame.Services.Abtractions;
+﻿using BettySlotGame.Models;
+using BettySlotGame.Services.Abtractions;
+using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
 
 namespace BettySlotGame.Services
 {
     public class BettySlotGameEngine : ISlotEngine
     {
-        private readonly Random _random;
-
-        public BettySlotGameEngine(Random? radom = null)
+        private readonly IRandomNumberProvider _randomNumberProvider;
+        private readonly BettySlotSettings _settings;
+        public BettySlotGameEngine(IRandomNumberProvider randomNumberProvider, IOptions<BettySlotSettings> settings)
         {
-            _random = radom ?? new Random();
+            _settings = settings.Value;
+            _randomNumberProvider = randomNumberProvider;
         }
 
-        public decimal Bet(decimal bet)
+        public (bool, decimal) Bet(decimal bet)
         {
-            // Generates a random number between 1 and 100
-            var roll = _random.Next(1, 101); 
+            var roll = _randomNumberProvider.GetRandomNumber() * 100;
 
-            //50% chance to lose
-            if (roll <= 50) 
+            var loseThreshold = _settings.LoseBetPercentage;
+            var normalWinThreshold = loseThreshold + _settings.NormalWinBetPercentage;
+            var bigWinThreshold = normalWinThreshold + _settings.BigWinsBetPercentage;
+
+            if (roll <= loseThreshold)
             {
-                return 0;
+                return (false, 0);
             }
-            //40% chance to win a small amount
-            else if (roll <= 90)
+            else if (roll <= normalWinThreshold)
             {
-                return bet * 2;
+                return (true, bet * _settings.NormalWinBetMultiplier);
             }
-            //10% chance to win a medium amount (roll > 90)
+            else if(roll <= bigWinThreshold)
+            {
+                var betMultiplier = BigWinsRange();
+
+                return (true, bet * betMultiplier);
+            }
             else
             {
-                //_random.NextDouble() * 8.0 sets the multiplier to a random value between 0.0 and 8.0,
-                //then adding 2.0 ensures the multiplier is always at least 2.0,
-                //resulting in a final multiplier range of [2.0, 10.0).
-                var multiplier = (decimal)(_random.NextDouble() * 8.0 + 2.0);
-                return Math.Round(bet * multiplier, 2);
+                throw new InvalidOperationException("Invalid roll distribution.");
             }
+        }
+
+        private decimal BigWinsRange()
+        {
+            var randomNumber = _randomNumberProvider.GetRandomNumber();
+            var minMultiplier = _settings.BigWinMinMultiplier;
+            var maxMultiplier = _settings.BigWinMaxMultiplier;
+
+            var betMultiprier = minMultiplier + (decimal)randomNumber * (maxMultiplier - minMultiplier);
+
+            return betMultiprier;
         }
     }
 }

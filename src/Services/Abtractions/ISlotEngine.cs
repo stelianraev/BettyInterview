@@ -2,6 +2,6 @@
 {
     public interface ISlotEngine
     {
-        decimal Bet(decimal bet);
+        (bool, decimal) Bet(decimal bet);
     }
 }

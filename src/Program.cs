@@ -2,11 +2,12 @@
 using BettySlotGame.Models;
 using BettySlotGame.Services;
 using BettySlotGame.Services.Abtractions;
-using BettySlotGame.Services.Validators;
-using FluentValidation;
+using BettySlotGame.Services.BettySlotGame.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BettySlotGame
 {
@@ -19,13 +20,17 @@ namespace BettySlotGame
             using var host = Host.CreateDefaultBuilder(args)
                 .ConfigureServices((context, services) =>
                 {
+                    services.Configure<BettySlotSettings>(context.Configuration.GetSection("BettySlotSettings"));
+                    services.Configure<WalletSettings>(context.Configuration.GetSection("WalletSettings"));
+
                     services.AddSingleton(cts);
                     services.AddSingleton<ISlotEngine, BettySlotGameEngine>();
                     services.AddSingleton<IWalletService, WalletService>();
                     services.AddSingleton<ISlotGameService, SlotGameService>();
-                    services.AddSingleton<ICommandService, CommandService>();
-                    services.AddSingleton<IValidator<Command>, CommandValidator>();
+                    services.AddSingleton<ICommandRegistry, CommandRegistry>();
                     services.AddSingleton<IConsoleService, ConsoleService>();
+                    services.AddSingleton<IRandomNumberProvider, RandomNumberProvider>();
+                    services.AddSingleton<IValidateOptions<BettySlotSettings>, BettySlotSettingsValidator>();
 
                     services.RegisterAllCommands();
 
@@ -33,7 +38,6 @@ namespace BettySlotGame
                     {
                         builder.ClearProviders();
                     });
-
                 })
                 .Build();
 

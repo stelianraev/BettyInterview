@@ -1,59 +1,57 @@
 ﻿using BettySlotGame.Models;
 using BettySlotGame.Services.Abtractions;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace BettySlotGame.Commands
 {
-    public class DepositCommand : ICommand
+    public class DepositCommand : ISlotCommand
     {
-        private readonly IWalletService _wallet;
-        private readonly IValidator<Command> _validator;
-        private readonly ILogger<DepositCommand> _logger;
+        private readonly IWalletService _walletService;
         private readonly IConsoleService _consoleService;
+        private readonly ILogger<DepositCommand> _logger;
 
-        public DepositCommand(IValidator<Command> valdator, IWalletService wallet, IConsoleService consoleService, ILogger<DepositCommand> logger)
+        public DepositCommand(IWalletService walletService, IConsoleService consoleService, ILogger<DepositCommand> logger)
         {
-            _validator = valdator;
-            _wallet = wallet;
-            _logger = logger;
+            _walletService = walletService;
             _consoleService = consoleService;
+            _logger = logger;
         }
 
         public string Name => CommandEnum.Deposit.ToString();
 
-        public void Execute(string[] args, CancellationToken cancellationToken)
+        public event EventHandler? CanExecuteChanged;
+
+        public bool CanExecute(object? parameter)
         {
-            try
+            if (parameter is InputCommand command)
             {
-                if (args.Length < 2 || !decimal.TryParse(args[1], out var amount))
+                if (command.Value == null)
                 {
-                    _consoleService.WriteLine("Unknow command");
-                    _logger.LogInformation($"Invalid input {args.ToString()}");
-                    return;
+                    return false;
                 }
+            }                       
 
-                var command = new Command { CommandName = "deposit", Value = amount };
-                var result = _validator.Validate(command);
+            return true;
+        }
 
-                if (!result.IsValid)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        _consoleService.WriteLine($"{error.ErrorMessage}");
-                    }
-
-                    return;
-                }
-
-                _wallet.Deposit(amount);
-
-                return;
-            }
-            catch (Exception ex)
+        public void Execute(object? parameter)
+        {
+            if (parameter is InputCommand command)
             {
-                _logger.LogError(ex, "An error occurred while executing the deposit command.");
-                return;
+                var canExecute = CanExecute(command);
+
+                if (!canExecute)
+                {
+                    throw new ArgumentException("Invalid deposit");
+                }
+                else
+                {
+                    var depositAmount = (decimal)command.Value!;
+
+                    _walletService.Deposit(depositAmount);
+                    _consoleService.WriteLine($"Your deposit of ${depositAmount} was successful. Your current balance is: ${_walletService.Balance.ToString("0.##")}");
+                    _logger.LogInformation($"Successfully deposited ${depositAmount}. Current balance: ${_walletService.Balance.ToString("0.##")}");
+                }
             }
         }
     }
